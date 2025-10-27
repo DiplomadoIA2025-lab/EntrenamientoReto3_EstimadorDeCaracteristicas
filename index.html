@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reto 3: El Estimador de Características</title>
+    <title>Reto 3 (Integrado): El Estimador</title>
     <!-- Incluimos Tailwind CSS para un diseño moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Usamos la fuente Inter, que es muy legible y moderna -->
@@ -73,6 +73,14 @@
             color: #e2e8f0; /* slate-200 */
             position: relative;
         }
+         
+        /* Estilo para el código inline */
+        code {
+            @apply bg-slate-700 text-sky-300 rounded px-1.5 py-0.5 font-mono text-sm;
+        }
+        pre code {
+            @apply bg-transparent text-inherit rounded-none p-0 text-base;
+        }
         
         /* Botón de copiar */
         .copy-btn {
@@ -103,6 +111,45 @@
             text-align: center;
             box-shadow: 0 0 30px rgba(14, 165, 233, 0.5);
         }
+
+        /* Estilo del botón de ayuda */
+        .help-btn {
+            background-color: #1e293b; /* slate-800 */
+            border: 2px solid #475569; /* slate-600 */
+            color: #e2e8f0; /* slate-200 */
+            font-weight: bold;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px; /* Círculo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .help-btn:hover {
+            background-color: #334155; /* slate-700 */
+            border-color: #0ea5e9; /* sky-500 */
+        }
+
+        /* Estilos del Modal de Ayuda */
+        #help-modal .analogy-box {
+            @apply bg-sky-900 bg-opacity-40 border border-sky-700 p-4 rounded-lg mt-4 text-sky-100;
+        }
+        #help-modal .warning-box {
+             @apply bg-amber-900 bg-opacity-40 border border-amber-700 p-4 rounded-lg mt-4 text-amber-100;
+        }
+        #help-modal p {
+            @apply mb-3;
+        }
+        #help-modal code {
+             @apply text-base;
+        }
+        #help-modal pre {
+            @apply text-sm;
+        }
+
     </style>
 </head>
 <body class="text-gray-100 min-h-screen flex items-center justify-center p-4">
@@ -113,8 +160,9 @@
         <!-- Pantalla de Bienvenida -->
         <div id="welcome-screen" class="text-center p-8 bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700">
             <h1 class="text-4xl font-bold mb-4 text-sky-400">¡Bienvenido al Reto 3!</h1>
-            <h2 class="text-2xl font-semibold mb-6">El Estimador de Características 🎯</h2>
-            <p class="text-lg mb-8 text-gray-300">¡Quiubo, veci! Ya sabe cargar datos y clasificar. ¡Ahora vamos a *predecir un número*! Vamos a estimar el nivel de alcohol.</p>
+            <h2 class="text-2xl font-semibold mb-6">El Estimador de Características (Integrado) 🎯</h2>
+            <p class="text-lg mb-4 text-gray-300">¡Quiubo, veci! Ya sabe cargar datos y clasificar. ¡Ahora vamos a *predecir un número*!</p>
+            <p class="text-lg mb-8 text-gray-300">Juegue y, si se pierde, <b>¡oprima el botón de ayuda (?)</b> para ver la guía de estudio!</p>
             <p class="text-lg mb-8 text-gray-300">Pa' saber a quién felicitar al final, regáleme su nombre:</p>
             <input type="text" id="player-name-input" class="w-full max-w-md p-3 rounded-lg bg-gray-700 border border-gray-600 text-white text-lg focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Escriba su nombre aquí...">
             <button id="start-game-btn" class="mt-6 w-full max-w-md bg-sky-600 hover:bg-sky-500 text-white text-xl font-bold py-3 px-6 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105">
@@ -126,7 +174,11 @@
         <div id="game-screen" class="hidden p-6 md:p-10 bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700">
             <!-- Encabezado del Juego -->
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700">
-                <h2 class="text-2xl font-bold text-sky-400" id="step-title"></h2>
+                <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-bold text-sky-400" id="step-title"></h2>
+                    <!-- Botón de ayuda -->
+                    <button id="help-button" class="help-btn">?</button>
+                </div>
                 <div class="text-lg font-semibold">
                     <span class="mr-2">Vidas:</span>
                     <span id="lives-container" class="text-xl"></span>
@@ -203,6 +255,19 @@
 
     </div>
 
+    <!-- Modal de Ayuda (Aquí se inyecta el contenido de la guía) -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 w-full max-w-2xl p-6 rounded-2xl shadow-2xl border border-gray-700 text-gray-200 overflow-y-auto max-h-[90vh]">
+            <h3 id="help-modal-title" class="text-2xl font-bold mb-4 text-sky-400"></h3>
+            <div id="help-modal-text" class="text-lg space-y-4">
+                <!-- El contenido de la ayuda se inyecta aquí -->
+            </div>
+            <button id="help-modal-close-btn" class="mt-6 w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-5 rounded-lg shadow-lg">
+                ¡Entendido, parcero!
+            </button>
+        </div>
+    </div>
+
     <!-- Lógica del Juego -->
     <script>
         // Referencias a los elementos del DOM
@@ -241,18 +306,31 @@
         const restartGameBtn = document.getElementById('restart-game-btn');
         const playAgainBtn = document.getElementById('play-again-btn');
 
+        // Referencias al Modal de Ayuda
+        const helpButton = document.getElementById('help-button');
+        const helpModal = document.getElementById('help-modal');
+        const helpModalTitle = document.getElementById('help-modal-title');
+        const helpModalText = document.getElementById('help-modal-text');
+        const helpModalCloseBtn = document.getElementById('help-modal-close-btn');
+
         // Estado del juego
         let playerName = "";
         let lives = 3;
         let currentStep = 0; // Índice del paso actual
 
-        // Base de datos de los pasos del juego (AHORA PARA EL RETO 3)
+        // Base de datos de los pasos del juego (AHORA PARA EL RETO 3 CON AYUDA)
+        // El contenido de la 'guia-reto3.html' ha sido adaptado e inyectado
+        // en los campos de 'help' de cada paso.
         const gameSteps = [
             // --- PASO 1: CARGAR DATOS (Repaso) ---
             {
                 type: 'concept',
                 title: 'Paso 1: ¿Qué es "Pandas"? (Repaso)',
-                text: '¡Quiubo, veci! Vamos a repasar. <b>Pandas</b> es la "caja de herramientas" para trabajar con tablas (como un Excel). Para usarla, la "importamos" con su apodo: <b><code>import pandas as pd</code></b>.'
+                text: '¡Quiubo, veci! Vamos a repasar. <b>Pandas</b> es la "caja de herramientas" para trabajar con tablas (como un Excel). Para usarla, la "importamos" con su apodo: <b><code>import pandas as pd</code></b>.',
+                help: {
+                    title: 'Módulo 1: Carga y Filtro (¡Pan comido!)',
+                    text: '<p>¡Porque en el 90% de los trabajos de IA, el primer paso SIEMPRE es el mismo: cargar datos!</p><p>Pandas es el "pana" fiel. No importa si uno va a hacer una Red Neuronal súper avanzada o una gráfica simple, uno primero tiene que importar <code>pandas</code>, usar <code>pd.read_csv()</code> (o <code>read_excel</code>, <code>read_json</code>...) y cargar los datos en un DataFrame. Es el "calentamiento" obligatorio de la IA.</p>'
+                }
             },
             {
                 type: 'question',
@@ -265,25 +343,41 @@
                     { text: 'import csv_reader', correct: false }
                 ],
                 feedback_correct: '¡Eso es, veci! <b><code>import pandas as pd</code></b> es el conjuro mágico. ¡Empezamos bien!',
-                feedback_incorrect: 'Uy, veci, esa no es. Acuérdese, en Python, la palabra clave para traer código es <b><code>import</code></b>, y el apodo estándar para pandas es <b><code>as pd</code></b>. ¡La correcta es <b><code>import pandas as pd</code></b>!'
+                feedback_incorrect: 'Uy, veci, esa no es. Acuérdese, en Python, la palabra clave para traer código es <b><code>import</code></b>, y el apodo estándar para pandas es <b><code>as pd</code></b>. ¡La correcta es <b><code>import pandas as pd</code></b>!',
+                help: {
+                    title: 'La "Sintaxis" de Python',
+                    text: '<p>La "sintaxis" es la "gramática" del idioma. Así como en español decimos "El carro es rojo" (Sujeto + Verbo + Adjetivo), Python tiene sus reglas.</p><p>La regla para traer librerías es:<br><code>import [nombre_libreria] as [apodo]</code></p><p>Cualquier otra forma (<code>load</code>, <code>include</code>, etc.) es como decir "Rojo carro el es". ¡Python no le va a entender y le bota un <code>SyntaxError</code>!</p>'
+                }
             },
             {
                 type: 'concept',
                 title: 'Paso 1: Leer y Guardar (Repaso)',
-                text: 'Para leer el archivo CSV desde la URL usamos <b><code>pd.read_csv(url)</code></b>. Y para guardar esos datos en una "cajita" (variable), usamos el igual (<b><code>=</code></b>).'
+                text: 'Para leer el archivo CSV desde la URL usamos <b><code>pd.read_csv(url)</code></b>. Y para guardar esos datos en una "cajita" (variable), usamos el igual (<b><code>=</code></b>).',
+                help: {
+                    title: 'Variables: Las "Cajas" de la Memoria',
+                    text: '<p>Piense en la memoria de Colab como una bodega gigante llena de estantes. Una "variable" es una "caja" que usted pone en un estante y le pone una etiqueta con un nombre.</p><p><code>url = "https://..."</code><br>(Usted creó una caja, le puso la etiqueta <b>url</b>, y guardó un texto (string) adentro).</p><p><code>df = pd.read_csv(url)</code><br>(Usted creó otra caja, le puso la etiqueta <b>df</b>, y guardó una tabla gigante (DataFrame) adentro).</p><p>Lo bueno es que después, solo tiene que "llamar" a la caja por su etiqueta (<code>df</code>) y Python sabe de una a qué tabla se refiere.</p>'
+                }
             },
             {
                 type: 'code',
                 title: 'Paso 1: Cargar los Datos',
                 code_explanation: '¡Perfecto! Ahora sí, vamos a cargar los datos. Copie estas líneas y péguelas en su Google Colab.',
                 code: 'import pandas as pd\n\nurl="https://archive.ics.uci.edu/static/public/186/data.csv"\ndf = pd.read_csv(url)',
-                output_explanation: 'Cuando corre eso, ¿ve que no sale nada? ¡Tranqui! Eso es bueno. Significa que los datos se cargaron desde la URL y se guardaron en una "cajita" (una variable) en la memoria, que llamamos <b><code>df</code></b>.'
+                output_explanation: 'Cuando corre eso, ¿ve que no sale nada? ¡Tranqui! Eso es bueno. Significa que los datos se cargaron desde la URL y se guardaron en una "cajita" (una variable) en la memoria, que llamamos <b><code>df</code></b>.',
+                help: {
+                    title: '¡Chismosear es la clave!',
+                    text: '<p>Un buen programador es chismoso. Nunca confía ciegamente. Después de cargar datos, siempre "chismosea" pa\' ver qué cargó.</p><p>Pruebe estos comandos en celdas nuevas (después de cargar el <code>df</code>):</p><p><b><code>df.head()</code></b>: Le muestra las primeras 5 filas (la "cabeza").<br><b><code>df.info()</code></b>: Le da un resumen de qué columnas hay y de qué "tipo" son (números, texto, etc.). ¡Súper útil!<br><b><code>df.describe()</code></b>: ¡El chisme completo! Le da un resumen estadístico (promedio, mínimo, máximo...) de TODAS las columnas que sean números.</p>'
+                }
             },
             // --- PASO 2: FILTRAR DATOS (Repaso) ---
             {
                 type: 'concept',
                 title: 'Paso 2: Filtrar los Vinos (Repaso)',
-                text: 'Igual que en el Reto 2, no nos sirven todos los vinos. El reto pide "solo los registros con quality igual a 5, y 6".<br><br>Usamos el mismo truco: "agarramos" la columna <b><code>df[\'quality\']</code></b> y usamos el poder <b><code>.isin([5, 6])</code></b>.'
+                text: 'Igual que en el Reto 2, no nos sirven todos los vinos. El reto pide "solo los registros con quality igual a 5, y 6".<br><br>Usamos el mismo truco: "agarramos" la columna <b><code>df[\'quality\']</code></b> y usamos el poder <b><code>.isin([5, 6])</code></b>.',
+                help: {
+                    title: '¿Por qué filtramos?',
+                    text: '<p>¡Porque el Reto nos lo pide! Pero en la vida real, esto se llama "Pre-procesamiento de Datos".</p><p>A veces los datos vienen "sucios". O a veces no nos interesa todo. Por ejemplo, si quisiéramos entrenar un modelo SOLO con vinos tintos, el primer paso sería filtrar:<br><code>df_tintos = df[df[\'color\'] == \'Red\']</code></p><p>O si quisiéramos quitar vinos que no tienen alcohol (¿datos errados?):<br><code>df_con_alcohol = df[df[\'alcohol\'] > 0]</code></p><p>Saber "colar" (filtrar) la tabla es el primer paso para "limpiar" los datos y dejar solo lo que nos sirve.</p>'
+                }
             },
             {
                 type: 'question',
@@ -296,25 +390,41 @@
                     { text: "df.filter('quality' == 5 or 6)", correct: false }
                 ],
                 feedback_correct: '¡Exacto, veci! <b><code>.isin([5, 6])</code></b> es la clave. La otra opción con `[5, 6, 7]` era del Reto 1. ¡Usted está en la jugada!',
-                feedback_incorrect: 'Casi, veci. La opción `[5, 6, 7]` era la del Reto 1. Para este reto (y el 2), nos piden *solo* 5 y 6. La forma correcta es <b><code>.isin([5, 6])</code></b>.'
+                feedback_incorrect: 'Casi, veci. La opción <code>[5, 6, 7]</code> era la del Reto 1. Para este reto (y el 2), nos piden *solo* 5 y 6. La forma correcta es <b><code>.isin([5, 6])</code></b>.',
+                help: {
+                    title: '¿Y si quiero los que NO están en la lista?',
+                    text: '<p>¡Uy, qué buena pregunta, veci!</p><p>Digamos que usted quiere lo contrario: "Tráigame TODOS los vinos, EXCEPTO los de calidad 5 y 6".</p><p>¡Fácil! Se usa el mismo <code>.isin()</code>, pero se le pone el "símbolo de negación" (~) al principio. Este símbolo <code>~</code> es el "NO" de Pandas.</p><p>Pille:<br><b><code>df[ ~df[\'quality\'].isin([5, 6]) ]</code></b></p><p>¡Y listo! Eso le traería los de calidad 3, 4, 7, 8 y 9. ¡Puro poder!</p>'
+                }
             },
             {
                 type: 'code',
                 title: 'Paso 2: Filtrar los Datos',
                 code_explanation: '¡Va volando, veci! Ahora guardemos ese filtro en una nueva "caja" llamada <code>df_filtered</code>. Copie y pegue esto en Colab:',
                 code: 'df_filtered = df[df[\'quality\'].isin([5, 6])]',
-                output_explanation: 'De nuevo, ¡Colab no le mostrará nada! Y eso sigue estando perfecto. Acabamos de crear una nueva variable, <b><code>df_filtered</code></b>, que ahora contiene *solamente* los vinos con calidad 5 y 6.'
+                output_explanation: 'De nuevo, ¡Colab no le mostrará nada! Y eso sigue estando perfecto. Acabamos de crear una nueva variable, <b><code>df_filtered</code></b>, que ahora contiene *solamente* los vinos con calidad 5 y 6.',
+                help: {
+                    title: '¿Qué tan grande quedó la tabla?',
+                    text: '<p>¡Ya sabe cómo "chismosear"!</p><p>En el Reto 1, la tabla filtrada (con 5, 6 y 7) tenía 6053 filas. ¿Y esta?</p><p>Escriba en una celda nueva:<br><b><code>df_filtered.shape</code></b></p><p>¡Le debería salir <b>(4974, 13)</b>! Ese es el número de vinos que tienen calidad 5 o 6. (El 4974 era una de las respuestas "cáscara" del Reto 1, ¿se acuerda?).</p>'
+                }
             },
             // --- PASO 3: DEFINIR X (FEATURES) ---
             {
                 type: 'concept',
                 title: 'Paso 3: ¿Qué son "X" e "y"? (Repaso)',
-                text: '¡Veci, esto es clave! Piense en una receta.<br><br>Las "características" (acidez, azúcar) son los <b>ingredientes (la "X")</b>.<br>La "etiqueta" o "valor" (la calidad o el alcohol) es el <b>resultado (la "y")</b>.<br><br>Vamos a entrenar un "cerebrito" para que aprenda a predecir la "y" (el resultado) mirando la "X" (los ingredientes).'
+                text: '¡Veci, esto es clave! Piense en una receta.<br><br>Las "características" (acidez, azúcar) son los <b>ingredientes (la "X")</b>.<br>La "etiqueta" o "valor" (la calidad o el alcohol) es el <b>resultado (la "y")</b>.<br><br>Vamos a entrenar un "cerebrito" para que aprenda a predecir la "y" (el resultado) mirando la "X" (los ingredientes).',
+                help: {
+                    title: 'Módulo 2: Separar X e y (¡Pilas a los cambios!)',
+                    text: '<p>¡Listo, veci! Tenemos la tabla <code>df_filtered</code>. Ahora, a separar "ingredientes" (X) y "resultado" (y). ¡Pero ojo, que el Reto 3 cambia las reglas!</p><p class="font-semibold text-xl mt-6">Definir X (Los Ingredientes):</p><p class="text-lg mb-2">El reto pide: "Definir X con las características desde <b>0-9</b>". ¡Ojo, hasta la 9! Son las primeras <b>10 columnas</b> (no 11 como antes).</p><p class="font-semibold text-xl mt-6">Definir y (El Resultado):</p><p class="text-lg mb-2">El reto pide: "Definir y con la característica <b>\'alcohol\'</b>". ¡Ya no es \'quality\'!</p><div class="warning-box"><p class="font-bold text-amber-300 text-lg">⚠️ ¡Los Dos Cambios Clave!</p><p><b>X ahora es <code>0:10</code></b> (10 columnas, no 11).<br><b>y ahora es <code>\'alcohol\'</code></b> (no \'quality\').</p><p>¡Si no hace estos dos cambios, el resto del reto le va a salir mal!</p></div>'
+                }
             },
             {
                 type: 'concept',
                 title: 'Paso 3: ¿Cómo "rebanamos" la tabla?',
-                text: '¡OJO AQUÍ, VECI! El reto 2 pedía columnas 0-10. Este reto pide "características desde 0-9". O sea, las primeras 10 columnas.<br><br>Usamos <b><code>.iloc[filas, columnas]</code></b>.<br>Para "todas las filas" usamos <b><code>:</code></b><br>Para las columnas 0 *hasta* la 10 (sin incluirla), usamos <b><code>0:10</code></b>.<br>¡El truco es: <code>df_filtered.iloc[:, 0:10]</code>!'
+                text: '¡OJO AQUÍ, VECI! El reto 2 pedía columnas 0-10. Este reto pide "características desde 0-9". O sea, las primeras 10 columnas.<br><br>Usamos <b><code>.iloc[filas, columnas]</code></b>.<br>Para "todas las filas" usamos <b><code>:</code></b><br>Para las columnas 0 *hasta* la 10 (sin incluirla), usamos <b><code>0:10</code></b>.<br>¡El truco es: <code>df_filtered.iloc[:, 0:10]</code>!',
+                help: {
+                    title: 'El "truco del pan tajado" (Slicing)',
+                    text: '<p>Esa notación <b><code>[inicio:fin]</code></b> se llama "slicing" (rebanar). ¡Es la clave de Python!</p><p>La regla de oro es: "<b>se incluye el inicio, pero se excluye el fin</b>".</p><p>Si usted tiene una lista <code>[A, B, C, D, E]</code> (posiciones 0, 1, 2, 3, 4):</p><p><code>lista[0:2]</code>: Agarra la posición 0 ("A") y la 1 ("B")... y para *antes* de la 2. Resultado: <code>[A, B]</code>.</p><p>Por eso, si el reto pide "0-9", tenemos que poner <b><code>0:10</code></b>. Porque así agarra 0, 1, 2, 3, 4, 5, 6, 7, 8, 9... y para *antes* de la 10. ¡Justo lo que queríamos!</p>'
+                }
             },
             {
                 type: 'question',
@@ -327,20 +437,32 @@
                     { text: 'X = df_filtered.loc[:, 0:9]', correct: false }
                 ],
                 feedback_correct: '¡Perfecto! <b><code>.iloc</code></b> es por número. <b><code>[:, 0:10]</code></b> es el truco: "todas las filas, columnas desde la 0 hasta la 10 (sin coger la 10)". ¡El <code>0:11</code> era del reto pasado!',
-                feedback_incorrect: '¡Ojo al piojo, veci! <b><code>.iloc</code></b> funciona con <code>[filas, columnas]</code>. El reto pide 0-9, o sea, <code>0:10</code> (el último número no se incluye). La opción <code>0:11</code> era del Reto 2. ¡La correcta es la primera!'
+                feedback_incorrect: '¡Ojo al piojo, veci! <b><code>.iloc</code></b> funciona con <code>[filas, columnas]</code>. El reto pide 0-9, o sea, <code>0:10</code> (el último número no se incluye). La opción <code>0:11</code> era del Reto 2. ¡La correcta es la primera!',
+                help: {
+                    title: '¿Por qué no .loc[:, 0:9]?',
+                    text: '<p>¡Uy, esa es una cáscara con veneno!</p><p><b><code>.iloc[:, 0:10]</code></b> (con <b>i</b>): Usa NÚMEROS de posición. Agarra de la 0 a la 9. ¡Correcto!</p><p><b><code>.loc[:, 0:9]</code></b> (sin <b>i</b>): Usa NOMBRES de las etiquetas. ¡Pero las etiquetas (nombres de las filas) de nuestra tabla filtrada no son 0, 1, 2, 3... ! Son 0, 1, 2, 4, 5... (¡se saltó la fila 3 porque quizás tenía calidad 8!).</p><p><code>.loc</code> con números solo funciona si las etiquetas son *exactamente* esos números. Como filtramos, ¡ya no podemos confiar en eso! Por eso <code>.iloc</code> (que va por "posición" pura y física) es la herramienta correcta aquí.</p>'
+                }
             },
             {
                 type: 'code',
                 title: 'Paso 3: Guardar la "X"',
                 code_explanation: '¡Súper! Copie esto en Colab para guardar los "ingredientes" (las primeras 10 columnas) en la "caja" <code>X</code>.',
                 code: 'X = df_filtered.iloc[:, 0:10]',
-                output_explanation: '¡Sin salida! Y eso está bien. Solo guardamos los "ingredientes" (las 10 columnas) en la cajita <b>X</b>. ¡Fácil!'
+                output_explanation: '¡Sin salida! Y eso está bien. Solo guardamos los "ingredientes" (las 10 columnas) en la cajita <b>X</b>. ¡Fácil!',
+                help: {
+                    title: '¿Qué columnas agarramos?',
+                    text: '<p>¡Chismosiemos!</p><p>En una celda nueva, escriba:<br><b><code>X.columns</code></b></p><p>Esto le mostrará los nombres de las 10 columnas que "rebanó". Debería ver:<br><code>Index([\'fixed_acidity\', \'volatile_acidity\', \'citric_acid\', \'residual_sugar\', \'chlorides\', \'free_sulfur_dioxide\', \'total_sulfur_dioxide\', \'density\', \'pH\', \'sulphates\'], dtype=\'object\')</code></p><p>¡Se dio cuenta! Dejó por fuera las columnas "alcohol", "quality" y "color". ¡Perfecto pa\' nuestro reto!</p>'
+                }
             },
             // --- PASO 4: DEFINIR Y (TARGET) ---
             {
                 type: 'concept',
                 title: 'Paso 4: Definir "y" (El Objetivo)',
-                text: '¡Ya tenemos la "X" (ingredientes)! Ahora falta la "y" (el objetivo).<br><br>El reto dice "Definir y con la característica \'alcohol\'". ¡OJO! Ya no es "quality". Vamos a predecir el nivel de alcohol.<br>Usamos el mismo truco para agarrar una columna: <b><code>[\'alcohol\']</code></b>.'
+                text: '¡Ya tenemos la "X" (ingredientes)! Ahora falta la "y" (el objetivo).<br><br>El reto dice "Definir y con la característica \'alcohol\'". ¡OJO! Ya no es "quality". Vamos a predecir el nivel de alcohol.<br>Usamos el mismo truco para agarrar una columna: <b><code>[\'alcohol\']</code></b>.',
+                help: {
+                    title: '¡El "Target" cambió!',
+                    text: '<p>¡Exacto, veci! Esto es lo bonito de la IA. La "X" y la "y" las define usted, según el problema que quiera resolver.</p><p><b>Problema Reto 2:</b> "Quiero predecir la <em>calidad</em>".<br><code>X = ...</code><br><code>y = df_filtered[\'quality\']</code></p><p><b>Problema Reto 3:</b> "Quiero predecir el <em>alcohol</em>".<br><code>X = ...</code><br><code>y = df_filtered[\'alcohol\']</code></p><p>¡Los "ingredientes" (X) pueden ser los mismos, pero la "receta" (el objetivo "y") cambió! Y como el objetivo cambió, el "cerebrito" que vamos a usar también tiene que cambiar.</p>'
+                }
             },
             {
                 type: 'question',
@@ -353,30 +475,50 @@
                     { text: "y = df_filtered(alcohol)", correct: false }
                 ],
                 feedback_correct: '¡Eso es! Sencillo y al punto. <b><code>y = df_filtered[\'alcohol\']</code></b>. ¡El <code>\'quality\'</code> era del reto pasado! ¡Ya estamos listos para entrenar!',
-                feedback_incorrect: '¡Casi! Acuérdese, para agarrar una sola columna por su *nombre*, lo más fácil es usar los corchetes. Y esta vez el reto pedía <b><code>[\'alcohol\']</code></b>, no <code>[\'quality\']</code>.'
+                feedback_incorrect: '¡Casi! Acuérdese, para agarrar una sola columna por su *nombre*, lo más fácil es usar los corchetes. Y esta vez el reto pedía <b><code>[\'alcohol\']</code></b>, no <code>[\'quality\']</code>.',
+                help: {
+                    title: 'Módulo 2: Mini-Reto de Verificación',
+                    text: '<div class="challenge-box"><p class="font-bold text-green-300 text-lg">🧠 Mini-Reto: Chismosear Tamaños (¡Nuevos!)</p><p class="mb-2">Después de correr esos dos comandos en Colab, verifique los tamaños con <code>.shape</code>:</p><pre><code class="language-python">print("Tamaño de X:", X.shape)\nprint("Tamaño de y:", y.shape)</code></pre><p class="text-sm text-gray-400 mt-2">¿Le salió <code>(4974, 10)</code> para X y <code>(4974,)</code> para y? ¡Perfecto! Mismo número de filas (4974), pero X ahora tiene 10 columnas y "y" es la del alcohol.</p></div>'
+                }
             },
             {
                 type: 'code',
                 title: 'Paso 4: Guardar la "y"',
                 code_explanation: 'Copie esto en Colab. Es el último paso de preparación de datos.',
                 code: 'y = df_filtered[\'alcohol\']',
-                output_explanation: '¡Nada por aquí! Solo guardamos los "objetivos" (la columna de alcohol) en la cajita <b>y</b>. ¡Ahora sí, a crear el "cerebrito"!'
+                output_explanation: '¡Nada por aquí! Solo guardamos los "objetivos" (la columna de alcohol) en la cajita <b>y</b>. ¡Ahora sí, a crear el "cerebrito"!',
+                help: {
+                    title: '¿Qué "forma" tienen X y y?',
+                    text: '<p>¡Chismosiemos por última vez antes de entrenar!</p><p><code>X.shape</code> le dará <b>(4974, 10)</b>. (4974 vinos, 10 ingredientes).</p><p><code>y.shape</code> le dará <b>(4974,)</b>. (4974 respuestas. La coma al final significa "es una lista larga, no una tabla").</p><p>¡El número de filas (4974) es el mismo! ¡Estamos listos!</p>'
+                }
             },
             // --- PASO 5: ENTRENAR EL MODELO ---
             {
                 type: 'concept',
                 title: 'Paso 5: ¿Clasificador vs. Regresor?',
-                text: '¡Veci, esta es la gran diferencia! Pille:<br>En el Reto 2, usamos un <b>Clasificador</b> (<code>MLPClassifier</code>) porque ponía "etiquetas" (Calidad 5 o Calidad 6).<br><br>Hoy, queremos predecir un *número* (ej: 9.4% de alcohol, 10.2%, etc.). Para esto, usamos un <b>Regresor</b> o "Estimador".'
+                text: '¡Veci, esta es la gran diferencia! Pille:<br>En el Reto 2, usamos un <b>Clasificador</b> (<code>MLPClassifier</code>) porque ponía "etiquetas" (Calidad 5 o Calidad 6).<br><br>Hoy, queremos predecir un *número* (ej: 9.4% de alcohol, 10.2%, etc.). Para esto, usamos un <b>Regresor</b> o "Estimador".',
+                help: {
+                    title: 'Módulo 3: ¡Cambiamos de Tarea! Regresión',
+                    text: '<p>¡Listo, veci! Ya tenemos los datos (X y y). Ahora, recordemos la diferencia clave:</p><ul class="list-disc list-inside text-lg space-y-2 mb-4 ml-4"><li><b>Clasificación (Reto 2):</b> Poner etiquetas (¿5 o 6?).</li><li><b>Regresión (Este Reto):</b> Predecir un número (¿9.4?, ¿10.1?, ¿11.5?).</li></ul><p>Como queremos predecir el nivel de <b>alcohol</b> (que es un número), ¡esto es <b>Regresión</b>!</p><div class="analogy-box"><p class="font-bold text-sky-300 text-lg">💡 Analogía del Adivino</p><p><b>Clasificador (Reto 2):</b> Era como un oráculo que miraba los ingredientes y decía "Este vino será del grupo 5" o "Este será del grupo 6".</p><p><b>Regresor (Este Reto):</b> Es como un adivino que mira los ingredientes y dice "¡Este vino tendrá <b>10.8</b> grados de alcohol!". Intenta pegarle al número exacto.</p></div>'
+                }
             },
             {
                 type: 'concept',
                 title: 'Paso 5: Traer el "Estimador"',
-                text: 'Este "cerebrito" se llama <b><code>MLPRegressor</code></b>. ¡El del reto pasado era *Classifier*! Lo traemos casi igual desde la súper-librería <b><code>sklearn</code></b>:<br><br><b><code>from sklearn.neural_network import MLPRegressor</code></b>'
+                text: 'Este "cerebrito" se llama <b><code>MLPRegressor</code></b>. ¡El del reto pasado era *Classifier*! Lo traemos casi igual desde la súper-librería <b><code>sklearn</code></b>:<br><br><b><code>from sklearn.neural_network import MLPRegressor</code></b>',
+                help: {
+                    title: 'Módulo 4: El "Cerebrito" MLPRegressor',
+                    text: '<p>El reto nos pide usar el primo del modelo anterior: el <b>MLPRegressor</b> (Multi-Layer Perceptron Regressor).</p><p>¡Es la misma idea de "cerebrito" con neuronas y capas, pero ajustado para predecir números en vez de etiquetas!</p><p>Vive en el mismo "cajón" <code>neural_network</code> de <code>sklearn</code>. ¡Pero ojo al nombre!</p><pre><code class="language-python">from sklearn.neural_network import MLPRegressor # ¡No Classifier!</code></pre>'
+                }
             },
             {
                 type: 'concept',
                 title: 'Paso 5: Crear y Entrenar (Repaso)',
-                text: 'Esto es igualito:<br>1. "Creamos" el cerebrito con las reglas del reto: <b><code>mlp = MLPRegressor(...)</code></b>.<br>2. ¡Lo ponemos a "estudiar" (entrenar)! Usamos el comando <b><code>.fit()</code></b>.<br><br><b><code>mlp.fit(X, y)</code></b><br>(Oiga, <code>mlp</code>, *ajústese* (aprenda) a cómo la <code>X</code> produce la <code>y</code>).'
+                text: 'Esto es igualito:<br>1. "Creamos" el cerebrito con las reglas del reto: <b><code>mlp = MLPRegressor(...)</code></b>.<br>2. ¡Lo ponemos a "estudiar" (entrenar)! Usamos el comando <b><code>.fit()</code></b>.<br><br><b><code>mlp.fit(X, y)</code></b><br>(Oiga, <code>mlp</code>, *ajústese* (aprenda) a cómo la <code>X</code> produce la <code>y</code>).',
+                help: {
+                    title: 'Módulo 5: ¡A Estudiar Pa\' Adivinar!',
+                    text: '<div class="analogy-box"><p class="font-bold text-sky-300 text-lg">💡 Analogía del Aprendiz Adivino</p><p><code>mlp = MLPRegressor(...)</code>: Contrató a un aprendiz de adivino (<code>mlp</code>) y le dio el manual (parámetros).</p><p><code>X</code>, <code>y</code>: Le entrega miles de ejemplos de "ingredientes" (X) y el "nivel de alcohol" real que salió (y).</p><p><b><code>mlp.fit(X, y)</code></b>: Le dice al aprendiz: "¡Mire estos ejemplos y APRENDA (ajústese) pa\' que la próxima vez le atine al número!".</p><p>El aprendiz empieza a mezclar (procesar datos), adivina "10.5", ve que era "9.4", dice "¡Upa, me pasé!", corrige su fórmula (ajusta pesos)... ¡hasta que sus "descaches" sean chiquitos!</p></div>'
+                }
             },
             {
                 type: 'question',
@@ -389,25 +531,41 @@
                     { text: "MLPRegressor(layers=(100), seed=10, function='tanh')", correct: false }
                 ],
                 feedback_correct: '¡Al detalle, veci! Notó que era <b><code>MLPRegressor</code></b> y no *Classifier*. Y los parámetros <b><code>(100)</code></b> (una capa de 100 neuronas) y <b><code>activation=\'tanh\'</code></b> son los correctos.',
-                feedback_incorrect: '¡Uy! Los parámetros tienen que ser exactos. Ojo que el reto pide un <b><code>MLPRegressor</code></b> (para números), no un *Classifier* (para etiquetas). Y los parámetros eran <code>(100)</code> y <code>\'tanh\'</code>.'
+                feedback_incorrect: '¡Uy! Los parámetros tienen que ser exactos. Ojo que el reto pide un <b><code>MLPRegressor</code></b> (para números), no un *Classifier* (para etiquetas). Y los parámetros eran <code>(100)</code> y <code>\'tanh\'</code>.',
+                help: {
+                    title: '¿Nuevos Parámetros?',
+                    text: '<div class="warning-box"><p class="font-bold text-amber-300 text-lg">⚠️ ¡Parámetros Nuevos y el Nombre Correcto!</p><p>Asegúrese de usar <code>MLPRegressor</code> y los parámetros <code>(100)</code> y <code>\'tanh\'</code>. ¡Si usa los del Reto 2, le va a dar un resultado diferente!</p></div><p><b><code>hidden_layer_sizes=(100)</code></b>: ¡OJO! Ahora es <b>una sola capa</b> intermedia con <b>100 neuronas</b>. (Se recomienda poner <code>(100,)</code> con coma).</p><p><b><code>random_state=10</code></b>: La misma semilla pa\' que nos dé igual.</p><p><b><code>activation=\'tanh\'</code></b>: ¡OJO! Ahora pide la activación <b>\'tanh\'</b> (Tangente Hiperbólica), no \'logistic\'.</p>'
+                }
             },
             {
                 type: 'code',
                 title: 'Paso 5: ¡Entrenar el "Estimador"!',
                 code_explanation: '¡Muy bien! Ahora copie todo este bloque. Importamos, creamos y entrenamos al <code>mlp</code> con el comando <code>.fit(X, y)</code>.',
                 code: 'from sklearn.neural_network import MLPRegressor\n\nmlp = MLPRegressor(hidden_layer_sizes=(100), random_state=10, activation=\'tanh\')\nmlp.fit(X, y)',
-                output_explanation: '¡Colab le va a mostrar un montón de texto! Es solo la descripción del "cerebrito" que acaba de entrenar (<code>MLPRegressor(activation=\'tanh\', ...</code>).<br><br><b>¡OJO!</b> Es normal que salga un aviso amarillo (un \'Warning\') de \'ConvergenceWarning\'. ¡Fresco, no es un error! Solo nos dice que el \'cerebrito\' paró de estudiar porque llegó al límite de \'rounds\', no porque haya terminado perfecto. Para este reto, ¡está bien!'
+                output_explanation: '¡Colab le va a mostrar un montón de texto! Es solo la descripción del "cerebrito" que acaba de entrenar (<code>MLPRegressor(activation=\'tanh\', ...</code>).<br><br><b>¡OJO!</b> Es normal que salga un aviso amarillo (un \'Warning\') de \'ConvergenceWarning\'. ¡Fresco, no es un error! Solo nos dice que el \'cerebrito\' paró de estudiar porque llegó al límite de \'rounds\', no porque haya terminado perfecto. Para este reto, ¡está bien!',
+                help: {
+                    title: '¡Ese "Warning" amarillo!',
+                    text: '<div class="warning-box"><p class="font-bold text-amber-300 text-lg">⚠️ ¡El Aviso Amarillo (Warning)!</p><p>Le va a salir casi seguro el <code>ConvergenceWarning</code>. ¡No es un error! Solo significa que el modelo paró de estudiar porque se le acabó el tiempo (las "rondas" por defecto), no porque estuviera 100% perfecto. ¡Para el reto, está perfecto!</p></div>'
+                }
             },
              // --- PASO 6: OBTENER EL ERROR ---
             {
                 type: 'concept',
                 title: 'Paso 6: ¿Cómo medimos la "nota" aquí?',
-                text: '¡Veci, no podemos usar ".score()" como en el Reto 2! El "score" era para "aciertos" (%). Aquí, como predecimos números (ej: 9.4), medimos el <b>Error</b>.<br><br>Vamos a usar el <b>"Mean Squared Error" (MSE)</b> o "Error Cuadrático Medio". Suena enredado, pero solo es: \'qué tan lejos, en promedio, se cayeron sus predicciones del número real\'.<br><br><b>¡Entre más chiquito el MSE, mejor!</b>'
+                text: '¡Veci, no podemos usar ".score()" como en el Reto 2! El "score" era para "aciertos" (%). Aquí, como predecimos números (ej: 9.4), medimos el <b>Error</b>.<br><br>Vamos a usar el <b>"Mean Squared Error" (MSE)</b> o "Error Cuadrático Medio". Suena enredado, pero solo es: \'qué tan lejos, en promedio, se cayeron sus predicciones del número real\'.<br><br><b>¡Entre más chiquito el MSE, mejor!</b>',
+                help: {
+                    title: 'Módulo 6: ¿Qué Tan "Descachado" Quedó?',
+                    text: '<p>¡Listo el estimador! El "cerebrito" <code>mlp</code> ya estudió cómo predecir el alcohol. Ahora, ¿qué tan bien le fue?</p><p>En Regresión, no medimos "aciertos", medimos el <b>"Error"</b>: qué tan lejos quedaron las predicciones de los números reales. ¡Entre más chiquito el error, mejor!</p><p>El reto pide el <b>Mean Squared Error (MSE)</b> - Error Cuadrático Medio.</p>'
+                }
             },
             {
                 type: 'concept',
                 title: 'Paso 6: ¿Cómo se calcula el MSE?',
-                text: 'Necesitamos dos pasos:<br>1. Pedirle al "cerebrito" sus predicciones (qué "estimó" él):<br><b><code>y_pred = mlp.predict(X)</code></b><br><br>2. Importar la herramienta de MSE y usarla:<br><b><code>from sklearn.metrics import mean_squared_error</code></b><br><b><code>mse = mean_squared_error(y, y_pred)</code></b><br>(Compara los reales "y" con los predichos "y_pred").'
+                text: 'Necesitamos dos pasos:<br>1. Pedirle al "cerebrito" sus predicciones (qué "estimó" él):<br><b><code>y_pred = mlp.predict(X)</code></b><br><br>2. Importar la herramienta de MSE y usarla:<br><b><code>from sklearn.metrics import mean_squared_error</code></b><br><b><code>mse = mean_squared_error(y, y_pred)</code></b><br>(Compara los reales "y" con los predichos "y_pred").',
+                help: {
+                    title: 'Pasos para el MSE',
+                    text: '<p class="font-semibold text-xl mt-6">Paso 1: Hacer las Predicciones</p><p class="text-lg mb-2">Primero, le pedimos al modelo que "adivine" el alcohol para todos nuestros vinos (usando la <code>X</code>). Esto se hace con <b><code>.predict()</code></b>:</p><pre><code class="language-python">y_pred = mlp.predict(X)</code></pre><p class="text-lg my-2">Ahora, <code>y_pred</code> es una lista larga con los 4974 niveles de alcohol que el modelo *predijo*.</p><p class="font-semibold text-xl mt-6">Paso 2: Calcular el MSE</p><p class="text-lg mb-2">Necesitamos la herramienta pa\' calcular el MSE. Vive en <code>sklearn.metrics</code>:</p><pre><code class="language-python">from sklearn.metrics import mean_squared_error</code></pre><p class="text-lg my-2">Ahora, comparamos las respuestas reales (<code>y</code>) con las predicciones (<code>y_pred</code>):</p><pre><code class="language-python">mse = mean_squared_error(y, y_pred)</code></pre><div class="warning-box"><p class="font-bold text-amber-300 text-lg">⚠️ ¡No usar .score()!</p><p>Si usted corre <code>mlp.score(X, y)</code> en un <b>Regressor</b>, ¡NO le da el MSE! Le da otra métrica llamada "R cuadrado" (R²), que es más enredada. El reto pide explícitamente el <b>MSE</b>, por eso toca hacerlo en dos pasos: <code>.predict()</code> y luego <code>mean_squared_error()</code>.</p></div>'
+                }
             },
             {
                 type: 'question',
@@ -420,14 +578,22 @@
                     { text: 'mse = mlp.mean_squared_error(y, y_pred)', correct: false }
                 ],
                 feedback_correct: '¡Exacto! La función <b><code>mean_squared_error</code></b> se usa aparte, comparando los valores reales (<b><code>y</code></b>) con los que el modelo predijo (<b><code>y_pred</code></b>).',
-                feedback_incorrect: '¡Ojo! El <b><code>.score()</code></b> era del reto pasado (Clasificación). Para MSE (Regresión), importamos <b><code>mean_squared_error</code></b> de <b><code>sklearn.metrics</code></b> y la usamos para comparar <b><code>y</code></b> (reales) con <b><code>y_pred</code></b> (predicciones).'
+                feedback_incorrect: '¡Ojo! El <b><code>.score()</code></b> era del reto pasado (Clasificación). Para MSE (Regresión), importamos <b><code>mean_squared_error</code></b> de <b><code>sklearn.metrics</code></b> y la usamos para comparar <b><code>y</code></b> (reales) con <b><code>y_pred</code></b> (predicciones).',
+                help: {
+                    title: '¿De dónde salió "sklearn.metrics"?',
+                    text: '<p>¡De la misma súper-librería <code>sklearn</code>!</p><p><code>sklearn</code> es una caja de herramientas GIGANTE. Está organizada por "cajoncitos":</p><p><code>sklearn.neural_network</code>: El cajón con los "cerebritos" (MLPClassifier, MLPRegressor).</p><p><code>sklearn.metrics</code>: El cajón con las "métricas" o "calificaciones" (mean_squared_error, accuracy_score, etc.).</p><p><code>sklearn.model_selection</code>: El cajón pa\' "partir los datos" (ej: train_test_split).</p><p><code>sklearn.preprocessing</code>: El cajón pa\' "limpiar" los datos.</p><p>Por eso, pa\' traer el MSE, la "dirección" es: <code>from sklearn.metrics import mean_squared_error</code>.</p>'
+                }
             },
             {
                 type: 'code',
                 title: 'Paso 6: ¡Ver el Error Final!',
                 code_explanation: '¡Este es el momento de la verdad! Copie y pegue estas líneas en Colab para ver el resultado. (Vamos a importar la herramienta, predecir y calcular)',
                 code: 'from sklearn.metrics import mean_squared_error\n\ny_pred = mlp.predict(X)\nmse = mean_squared_error(y, y_pred)\n\nprint(f"Mean Squared Error: {mse}")',
-                output_explanation: '¡Ahí está! Colab le debe mostrar: <b><code>Mean Squared Error: 0.7796...</code></b><br><br>¡Ese es su "error"! No es 77%, ¡es un error de 0.77! Recuerde, en regresión, ¡entre más chiquito el número, mejor le fue!'
+                output_explanation: '¡Ahí está! Colab le debe mostrar: <b><code>Mean Squared Error: 0.7796...</code></b><br><br>¡Ese es su "error"! No es 77%, ¡es un error de 0.77! Recuerde, en regresión, ¡entre más chiquito el número, mejor le fue!',
+                help: {
+                    title: 'Módulo 7: ¡El Resultado!',
+                    text: '<p class="font-semibold text-xl mt-6">La Salida (Output) en Colab:</p><pre><code>Mean Squared Error: 0.7796509440266493</code></pre><p class="text-sm text-gray-400 mb-4">(Puede que salga el aviso amarillo de ConvergenceWarning antes, ¡no importa!).</p><div class="analogy-box"><p class="font-bold text-sky-300 text-lg">💡 ¿Qué significa ese 0.77?</p><p>Recuerde: MSE es el "Error Cuadrático Medio". ¡No es un porcentaje! Es el promedio de los "descaches" al cuadrado. Pa\' entenderlo mejor, le sacamos la raíz cuadrada (RMSE):</p><p>Raíz(0.7796...) ≈ <b>0.88</b></p><p>Esto significa que, en promedio, el modelo se "descacha" por <b>0.88 grados de alcohol</b> al hacer sus predicciones. ¡Nada mal pa\' empezar!</p></div>'
+                }
             },
             // --- PASO 7: RESPUESTA FINAL ---
             {
@@ -441,7 +607,11 @@
                     { text: 'd. 0.77', correct: true }
                 ],
                 feedback_correct: '¡FELICITACIONES, VECI! ¡Reto 3 superado! El error <code>0.7796...</code> se redondea a <code>0.77</code>. ¡Es un/a duro/a! ¡Ya sabe estimar valores con Redes Neuronales!',
-                feedback_incorrect: '¡No, veci! Revise bien el número que nos dio Colab en el paso anterior. Era <b><code>0.7796...</code></b>. El valor más cercano en la lista es <b>0.77</b>. ¡Esa es la pista! La respuesta correcta es la <b>d</b>.'
+                feedback_incorrect: '¡No, veci! Revise bien el número que nos dio Colab en el paso anterior. Era <b><code>0.7796...</code></b>. El valor más cercano en la lista es <b>0.77</b>. ¡Esa es la pista! La respuesta correcta es la <b>d</b>.',
+                help: {
+                    title: '¡Lo logró!',
+                    text: '<p>¡Felicitaciones, parcero!</p><p>Mire todo lo que hizo:<br>1. Cargó datos desde la web con <b>Pandas</b>.<br>2. Filtró miles de filas con <b>.isin()</b>.<br>3. Separó "Ingredientes" (X) de "Resultados" (y) con <b>.iloc[]</b>.<br>4. Entendió la diferencia entre <b>Clasificación</b> (Reto 2) y <b>Regresión</b> (Reto 3).<br>5. Entrenó una Red Neuronal (<b>MLPRegressor</b>) de <b>Sklearn</b>.<br>6. Midió el "descache" con <b>MSE</b>.</p><p>¡Usted ya sabe más IA que el 99% de la gente! ¡Siga así de pilo!</p>'
+                }
             },
             {
                 type: 'diploma'
@@ -500,6 +670,13 @@
             diplomaScreen.classList.add('hidden');
 
             const step = gameSteps[stepIndex];
+
+            // Mostrar u ocultar el botón de ayuda
+            if (step.help) {
+                helpButton.classList.remove('hidden');
+            } else {
+                helpButton.classList.add('hidden');
+            }
 
             if (step.type === 'concept') {
                 stepTitle.textContent = step.title;
@@ -642,6 +819,63 @@
                 copyCodeBtn.textContent = 'Copiar';
                 window.getSelection().removeAllRanges(); // Limpiar selección
             }, 1500);
+        });
+
+        // --- FUNCIONES DE AYUDA (Modal) ---
+
+        function showHelpModal() {
+            const step = gameSteps[currentStep];
+            if (step.help) {
+                helpModalTitle.innerHTML = step.help.title;
+                // Limpiar contenido anterior
+                helpModalText.innerHTML = ''; 
+                
+                // Crear un div temporal para parsear el HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = step.help.text;
+
+                // Aplicar estilos a las cajas especiales (ya que Tailwind no puede "ver" este HTML)
+                tempDiv.querySelectorAll('.analogy-box').forEach(box => {
+                    box.style.backgroundColor = 'rgba(14, 116, 144, 0.4)'; // bg-sky-900 bg-opacity-40
+                    box.style.border = '1px solid rgb(14 165 233 / 0.7)'; // border-sky-700
+                    box.style.padding = '1.25rem'; // p-5
+                    box.style.borderRadius = '0.5rem'; // rounded-lg
+                    box.style.marginTop = '1rem'; // mt-4
+                    box.style.color = 'rgb(224 242 254)'; // text-sky-100
+                });
+                tempDiv.querySelectorAll('.warning-box').forEach(box => {
+                    box.style.backgroundColor = 'rgba(120, 53, 15, 0.4)'; // bg-amber-900 bg-opacity-40
+                    box.style.border = '1px solid rgb(217 119 6 / 0.7)'; // border-amber-700
+                    box.style.padding = '1.25rem'; // p-5
+                    box.style.borderRadius = '0.5rem'; // rounded-lg
+                    box.style.marginTop = '1.5rem'; // mt-6
+                    box.style.color = 'rgb(254 243 199)'; // text-amber-100
+                });
+                 tempDiv.querySelectorAll('.challenge-box').forEach(box => {
+                    box.style.backgroundColor = 'rgba(20, 83, 45, 0.4)'; // bg-green-900 bg-opacity-40
+                    box.style.border = '1px solid rgb(22 163 74 / 0.7)'; // border-green-700
+                    box.style.padding = '1.25rem'; // p-5
+                    box.style.borderRadius = '0.5rem'; // rounded-lg
+                    box.style.marginTop = '1.5rem'; // mt-6
+                });
+
+                helpModalText.appendChild(tempDiv);
+                helpModal.classList.remove('hidden');
+            }
+        }
+
+        function closeHelpModal() {
+            helpModal.classList.add('hidden');
+        }
+
+        // Listeners para el modal
+        helpButton.addEventListener('click', showHelpModal);
+        helpModalCloseBtn.addEventListener('click', closeHelpModal);
+        helpModal.addEventListener('click', (event) => {
+            // Cerrar si se hace clic en el fondo oscuro
+            if (event.target === helpModal) {
+                closeHelpModal();
+            }
         });
 
     </script>
